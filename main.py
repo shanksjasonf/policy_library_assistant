@@ -8,7 +8,13 @@ def get_policy_summary(policy_record):
 
 def main():
     data_path = Path(__file__).parent / "data" / "policies.json"
-    policies = load_policies(data_path)
+
+    try:
+        policies = load_policies(data_path)
+    except FileNotFoundError:
+        print(f"Policy file not found: {data_path}")
+        return
+    
     search_term = input("Enter a policy search term: ")
     matching_policies = search_policies(policies, search_term)
 
