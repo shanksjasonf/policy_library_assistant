@@ -17,7 +17,8 @@ def get_policy_summary(policy_record):
     return f"{policy_record['policy_id']}: {policy_record['title']}"
 
 def main():
-    matching_policies = search_policies(policies, ' RETENTION ')
+    search_term = input("Enter a policy search term: ")
+    matching_policies = search_policies(policies, search_term)
 
     if not matching_policies:
         print("No matching policies found.")
