@@ -1,22 +1,14 @@
-from policy_search import search_policies
+from pathlib import Path
 
-policies = [
-    {
-        "policy_id": "POL-001",
-        "title": "Data Retention Policy",
-        "content": "Retain training records for two years.",
-    },
-    {
-        "policy_id": "POL-002",
-        "title": "Remote Work Policy",
-        "content": "Remote access requires multifactor authentication.",
-    }
-]
+from policy_loader import load_policies
+from policy_search import search_policies
 
 def get_policy_summary(policy_record):
     return f"{policy_record['policy_id']}: {policy_record['title']}"
 
 def main():
+    data_path = Path(__file__).parent / "data" / "policies.json"
+    policies = load_policies(data_path)
     search_term = input("Enter a policy search term: ")
     matching_policies = search_policies(policies, search_term)
 

@@ -1,0 +1,12 @@
+[
+    {
+        "policy_id": "POL-001",
+        "title": "Data Retention Policy",
+        "content": "Retain training records for two years."
+    },
+    {
+        "policy_id": "POL-002",
+        "title": "Remote Work Policy",
+        "content": "Remote access requires multifactor authentication."
+    }
+]
