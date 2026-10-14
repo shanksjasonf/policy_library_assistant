@@ -23,9 +23,10 @@ def search_policy_library(search_term: str) -> list[dict[str,str]]:
 
     policies = load_policies(data_path)
 
-    logger.info("Searching policy library.")
+    matches = search_policies(policies, search_term)
+    logger.info("Policy search completed; matches=%d", len(matches))
 
-    return search_policies(policies, search_term)
+    return matches
 
 
 if __name__ == "__main__":
@@ -33,5 +34,5 @@ if __name__ == "__main__":
         level=logging.INFO,
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
     )
-    
+
     mcp.run(transport="stdio")
