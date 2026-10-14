@@ -1,7 +1,8 @@
 import json
-
 from pathlib import Path
 from tempfile import TemporaryDirectory
+
+import pytest
 
 from policy_loader import load_policies
 
@@ -11,12 +12,10 @@ def assert_invalid_policy_data(json_text: str, expected_message: str):
         data_path = Path(temporary_folder) / "policies.json"
         data_path.write_text(json_text, encoding="utf-8")
 
-        try:
+        with pytest.raises(ValueError) as exception_info:
             load_policies(data_path)
-        except ValueError as error:
-            assert str(error) == expected_message, f"Unexpected error: {error}"
-        else:
-            raise AssertionError("Expected ValueError, but loading succeeded.")
+
+        assert str(exception_info.value) == expected_message
 
 
 def test_load_policies_reads_json():
@@ -94,10 +93,6 @@ def test_load_policies_rejects_malformed_json():
         data_path = Path(temporary_folder) / "policies.json"
         data_path.write_text('[{"title": }]', encoding="utf-8")
 
-        try:
+        with pytest.raises(json.JSONDecodeError):
             load_policies(data_path)
-        except json.JSONDecodeError:
-            pass
-        else:
-            raise AssertionError("Expected JSONDecodeError for malformed JSON.")
     
