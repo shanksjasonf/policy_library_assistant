@@ -1,3 +1,5 @@
+import json
+
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -87,6 +89,19 @@ def test_load_policies_rejects_non_string_policy_id():
     )
 
 
+def test_load_policies_rejects_malformed_json():
+    with TemporaryDirectory() as temporary_folder:
+        data_path = Path(temporary_folder) / "policies.json"
+        data_path.write_text('[{"title": }]', encoding="utf-8")
+
+        try:
+            load_policies(data_path)
+        except json.JSONDecodeError:
+            pass
+        else:
+            raise AssertionError("Expected JSONDecodeError for malformed JSON.")
+
+
 if __name__ == "__main__":
     test_load_policies_reads_json()
     test_load_policies_rejects_non_array()
@@ -97,5 +112,6 @@ if __name__ == "__main__":
     test_load_policies_rejects_non_string_content()
     test_load_policies_rejects_missing_policy_id()
     test_load_policies_rejects_non_string_policy_id()
+    test_load_policies_rejects_malformed_json()
     print("All policy loader tests passed.")
     
