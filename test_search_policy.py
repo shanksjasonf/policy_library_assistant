@@ -40,10 +40,3 @@ def test_search_normalizes_input():
 
     assert len(result) == 1, "Expected one matching policy"
     assert result[0]["policy_id"] == "TEST-003", "Expected data retention policy."
-    
-
-if __name__ == "__main__":
-    test_blank_search_returns_no_matches()
-    test_search_matches_content()
-    test_search_normalizes_input()
-    print("All search tests passed.")

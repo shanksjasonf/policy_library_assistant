@@ -100,18 +100,4 @@ def test_load_policies_rejects_malformed_json():
             pass
         else:
             raise AssertionError("Expected JSONDecodeError for malformed JSON.")
-
-
-if __name__ == "__main__":
-    test_load_policies_reads_json()
-    test_load_policies_rejects_non_array()
-    test_load_policies_rejects_non_object_record()
-    test_load_policies_rejects_missing_title()
-    test_load_policies_rejects_numeric_title()
-    test_load_policies_rejects_missing_content()
-    test_load_policies_rejects_non_string_content()
-    test_load_policies_rejects_missing_policy_id()
-    test_load_policies_rejects_non_string_policy_id()
-    test_load_policies_rejects_malformed_json()
-    print("All policy loader tests passed.")
     
