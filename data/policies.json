@@ -8,5 +8,15 @@
         "policy_id": "POL-002",
         "title": "Remote Work Policy",
         "content": "Remote access requires multifactor authentication."
+    },
+    {
+        "policy_id": "POL-003",
+        "title": "Personal Device Policy",
+        "content": "Personal devices may be used for remote work only when enrolled in the organization's device management system. Remote access requires multifactor authentication. Download of confidential information is prohibited on personal devices."
+    },
+    {
+        "policy_id": "POL-004",
+        "title": "Incident Reporting Policy",
+        "content": "Employees must immediately report suspected loss or exposure of confidential information to the security team. Reports must include when the incident was discovered, the systems involved, and the information affected. This policy does not define disciplinary outcomes."
     }
 ]
