@@ -4,7 +4,7 @@ from pathlib import Path
 from mcp.server import MCPServer
 
 from policy_loader import load_policies
-from policy_search import search_policies
+from policy_search import search_policies, get_policy_by_id
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +30,13 @@ def search_policy_library(search_term: str) -> list[dict[str, str]]:
     logger.info("Policy search completed; matches=%d", len(matches))
 
     return matches
+
+@mcp.tool()
+def get_policy(policy_id: str) -> dict[str, str] | None:
+    """Retrieve policy by exact ID or return None if not found."""
+    data_path = Path(__file__).parent / "data" / "policies.json"
+    policies = load_policies(data_path)
+    return get_policy_by_id(policies, policy_id)
 
 
 if __name__ == "__main__":
