@@ -35,3 +35,20 @@ def test_search_tool_rejects_long_input_before_loading(monkeypatch):
     assert str(exception_info.value) == (
         "Search term must be less than or equal to 200 characters."
     )
+
+def test_search_tool_accepts_200_characters(monkeypatch):
+    def fake_load_policies(data_path):
+        return [
+            {
+                "policy_id": "TEST-200",
+                "title": "x" * 200,
+                "content": "Synthetic boundary test content.",
+            }
+        ]
+
+    monkeypatch.setattr(mcp_server, "load_policies", fake_load_policies)
+
+    result = search_policy_library("x" * 200)
+
+    assert len(result) == 1
+    assert result[0]["policy_id"] == "TEST-200"
