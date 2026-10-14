@@ -19,7 +19,11 @@ def get_library_description() -> str:
 
 @mcp.tool()
 def search_policy_library(search_term: str) -> list[dict[str, str]]:
-    """Search policy titles and content using a case-insensitive substring."""
+    """Search policy titles and content using one case-insensitive substring.
+    
+    Use a short term such as 'remote' or 'personal device'.
+    A multi-word query must appear as one continuous phrase in the policy.
+    """
     if len(search_term) > 200:
         raise ToolError("Search term must be less than or equal to 200 characters.")
     

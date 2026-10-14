@@ -4,6 +4,7 @@ from pathlib import Path
 
 from mcp import Client, StdioServerParameters
 
+from tool_adapter import to_openai_tool
 
 async def main():
     server_path = Path(__file__).parent / "mcp_server.py"
@@ -14,14 +15,11 @@ async def main():
     )
 
     async with Client(server) as client:
-        result = await client.call_tool(
-            "search_policy_library",
-            {"search_term": "remote"},
-        )
+        result = await client.list_tools()
 
-    print(result.structured_content)
-    print(f"Tool failed: {result.is_error}")
-    print(result.content)
+        for tool in result.tools:
+            if tool.name == "search_policy_library":
+                print(to_openai_tool(tool))
 
 
 if __name__ == "__main__":
