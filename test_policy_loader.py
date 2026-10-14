@@ -16,6 +16,20 @@ def test_load_policies_reads_json():
         assert len(result) == 1, "Exactly one loaded policy."
         assert result[0]["policy_id"] == "TEST-001", "Expected the test policy."
 
+def test_load_policies_rejects_non_array():
+    with TemporaryDirectory() as temporary_folder:
+        data_path = Path(temporary_folder) / "policies.json"
+        data_path.write_text("{}", encoding="utf-8")
+
+        try:
+            load_policies(data_path)
+        except ValueError as error:
+            assert str(error) == "Policy data must be a JSON array."
+        else:
+            raise AssertionError("Expected ValueError for a JSON object.")
+
 if __name__ == "__main__":
     test_load_policies_reads_json()
-    print("Policy loader test passed.")
+    test_load_policies_rejects_non_array()
+    print("Both policy loader tests passed.")
+    

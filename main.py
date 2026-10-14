@@ -14,6 +14,9 @@ def main():
     except FileNotFoundError:
         print(f"Policy file not found: {data_path}")
         return
+    except ValueError as error:
+        print(f"Invalid policy data: {error}")
+        return
     
     search_term = input("Enter a policy search term: ")
     matching_policies = search_policies(policies, search_term)
