@@ -17,8 +17,11 @@ def get_library_description() -> str:
 
 
 @mcp.tool()
-def search_policy_library(search_term: str) -> list[dict[str,str]]:
+def search_policy_library(search_term: str) -> list[dict[str, str]]:
     """Search policy titles and content using a case-insensitive substring."""
+    if len(search_term) > 200:
+        raise ValueError("Search term must be less than or equal to 200 characters.")
+    
     data_path = Path(__file__).parent / "data" / "policies.json"
 
     policies = load_policies(data_path)
