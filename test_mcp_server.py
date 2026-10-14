@@ -3,6 +3,7 @@ import mcp_server
 import pytest
 
 from mcp_server import search_policy_library
+from mcp.server.mcpserver.exceptions import ToolError
 
 def test_search_tool_logs_match_count(caplog, monkeypatch):
     def fake_load_policies(data_path):
@@ -29,7 +30,7 @@ def test_search_tool_rejects_long_input_before_loading(monkeypatch):
 
     monkeypatch.setattr(mcp_server, "load_policies", unexpected_load)
 
-    with pytest.raises(ValueError) as exception_info:
+    with pytest.raises(ToolError) as exception_info:
         search_policy_library("x" * 201)
 
     assert str(exception_info.value) == (

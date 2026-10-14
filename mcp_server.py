@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 
 from mcp.server import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from policy_loader import load_policies
 from policy_search import search_policies, get_policy_by_id
@@ -20,7 +21,7 @@ def get_library_description() -> str:
 def search_policy_library(search_term: str) -> list[dict[str, str]]:
     """Search policy titles and content using a case-insensitive substring."""
     if len(search_term) > 200:
-        raise ValueError("Search term must be less than or equal to 200 characters.")
+        raise ToolError("Search term must be less than or equal to 200 characters.")
     
     data_path = Path(__file__).parent / "data" / "policies.json"
 
