@@ -16,3 +16,12 @@ def search_policies(policy_records, search_term: str):
             matches.append(policy_record)
 
     return matches
+
+
+def get_policy_by_id(policy_records, policy_id: str):
+    """Return the policy with the requested ID, or None if it is absent."""
+    for policy_record in policy_records:
+        if policy_record["policy_id"] == policy_id:
+            return policy_record
+
+    return None
