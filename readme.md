@@ -45,6 +45,7 @@ NOTE: the .env file stores the key in plain text and is excluded from Git and Do
 - Run the automated tests:
 ```
 & "./.venv/Scripts/python.exe" -m pytest -q
+```
 
 - Start the AI policy assistant:
 ```
