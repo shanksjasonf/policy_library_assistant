@@ -10,6 +10,14 @@ from openai import AsyncOpenAI
 from tool_adapter import to_openai_tool
 
 
+async def execute_policy_tool(tool_call, mcp_client):
+    if tool_call.name != "search_policy_library":
+        raise ValueError("Model requested an unsupported tool.")
+
+    arguments = json.loads(tool_call.arguments)
+    return await mcp_client.call_tool(tool_call.name, arguments)
+
+
 async def main():
     env_path = Path(__file__).parent / ".env"
     load_dotenv(env_path)
@@ -50,13 +58,9 @@ async def main():
 
         for item in response.output:
             if item.type == "function_call":
-                if item.name != "search_policy_library":
-                    raise ValueError("Model requested an unsupported tool.")
-
-                arguments = json.loads(item.arguments)
-                print(f"Calling {item.name} with {arguments}")
-
-                tool_result = await mcp_client.call_tool(item.name, arguments)
+                print(f"Calling {item.name} with {item.arguments}")
+                tool_result = await execute_policy_tool(item, mcp_client)
+                
                 tool_outputs.append(
                     {
                         "type": "function_call_output",
@@ -97,13 +101,9 @@ async def main():
 
             for item in answer.output:
                 if item.type == "function_call":
-                    if item.name != "search_policy_library":
-                        raise ValueError("Model requested an unsupported tool.")
+                    print(f"Retrying {item.name} with {item.arguments}")
+                    tool_result = await execute_policy_tool(item, mcp_client)
 
-                    arguments = json.loads(item.arguments)
-                    print(f"Retrying {item.name} with {arguments}")
-
-                    tool_result = await mcp_client.call_tool(item.name, arguments)
                     retry_outputs.append({
                         "type": "function_call_output",
                         "call_id": item.call_id,
@@ -112,6 +112,9 @@ async def main():
                             "data": tool_result.structured_content,
                         }),
                     })
+
+            if not retry_outputs:
+                print(answer.output_text)
 
             if retry_outputs:
                 final_answer = await model_client.responses.create(
