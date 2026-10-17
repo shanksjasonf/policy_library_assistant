@@ -9,11 +9,12 @@
 ## Cases
 | ID | Question | Expected Behavior | Result|
 |---|---|---|---|
-| E01 | How long should training records be retained | Two years; cite POL-001. | Pass |
-| E02 | Can I use a personal device for remote work? | Device enrollment, MFA, and download restriction; cite POL-003. | Not run |
-| E03 | How many vacation days do employees receive? | State insufficient evidence; do not estimate entitlement. | Not run |
-| E04 | What information must be included when reporting a security incident? | Discovery time, systems involved, information affected; cite POL-004. | Not run |
-| E05 | Will I be terminated if I accidentally expose confidential records? | Do not predict termination. If POL-004 is retrieved, explain that disciplinary outcomes are undefined. | Not run |
+| E01 | How long should training records be retained | Two years; cite POL-001. | PASS |
+| E02 | Can I use a personal device for remote work? | Device enrollment, MFA, and download restriction; cite POL-003. | PASS |
+| E03 | How many vacation days do employees receive? | State insufficient evidence; do not estimate entitlement. | PASS |
+| E04 | What information must be included when reporting a security incident? | Discovery time, systems involved, information affected; cite POL-004. | PASS |
+| E05 | Will I be terminated if I accidentally expose confidential records? | Do not predict termination. If POL-004 is retrieved, explain that disciplinary outcomes are undefined. | 1 PASS, 1 FAIL |
+| E06 | What restrictions apply to confidential information on personal devices, and what must I do if it is exposed? | Explain the download prohibition from POL-003 and immediate reporting requirements from POL-004; cite both. | Not run |
 
 ## Run Records
 Record each run's date, Git commit, model, question, search terms, returned policy IDs, final answer, and assessment.
@@ -87,3 +88,25 @@ Assess retrieval, factual support, citations, and retry behavior separately.
 - Retrieved IDs: [] → POL-003, POL-004
 - Retries: 1
 - Assessment: PASS - Retry recovered relevant evidence. Correct limitation and supporting citations. The personal device information was accurate; however, it was not relevant to the question.
+
+### E06-01
+
+- Date: 2026-10-17
+- Version: c3706f0 + local evidence reporting
+- Model: gpt-5.4-mini
+- Question: Will I be fired if I accidentally expose confidential records?
+- Search terms: confidential records → confidential
+- Retrieved IDs: [] → POL-003, POL-004
+- Retries: 1
+- Assessment: FAIL - Answer and citations passed. Multiple initial searches found both policies, but the final empty search caused an unnecessary retry.
+
+### E06-02
+
+- Date: 2026-10-17
+- Version: c3706f0 + local evidence reporting
+- Model: gpt-5.4-mini
+- Question: Will I be fired if I accidentally expose confidential records?
+- Search terms: confidential records → confidential
+- Retrieved IDs: [] → POL-003, POL-004
+- Retries: 1
+- Assessment: FAIL - Partial answer retrieved, but POL-004 was not identified so answer was incomplete.

@@ -104,6 +104,10 @@ def test_answer_policy_question_returns_answer_without_retry():
         {"search_term": "retention"},
     )
 
+    first_request = model_client.responses.create.call_args_list[0].kwargs
+    assert first_request["parallel_tool_calls"] is False
+    
+
 def test_answer_policy_question_retries_empty_search_once():
     tool_call = SimpleNamespace(
             type="function_call",

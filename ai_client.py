@@ -65,6 +65,7 @@ async def answer_policy_question(question, model_client, mcp_client):
         input=question,
         tools=tools,
         max_output_tokens=1000,
+        parallel_tool_calls=False,
     )
 
     tool_outputs = []
