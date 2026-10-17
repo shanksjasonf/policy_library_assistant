@@ -74,7 +74,7 @@ def test_answer_policy_question_returns_answer_without_retry():
 
     answer_response = SimpleNamespace(
         output=[],
-        output_test="Retain training records for two years. [POL-001]",
+        output_text="Retain training records for two years. [POL-001]",
     )
 
     model_client = SimpleNamespace(
@@ -129,7 +129,7 @@ def test_answer_policy_question_retries_empty_search_once():
 
     answer_response = SimpleNamespace(
         output=[],
-        output_test="Retain training records for two years. [POL-001]",
+        output_text="Retain training records for two years. [POL-001]",
     )
 
     model_client = SimpleNamespace(
@@ -164,3 +164,67 @@ def test_answer_policy_question_retries_empty_search_once():
         "search_policy_library",
         {"search_term": "training"},
     )
+
+def test_answer_policy_question_stops_after_empty_retry():
+    tool_call = SimpleNamespace(
+            type="function_call",
+            name="search_policy_library",
+            arguments='{"search_term": "retention"}',
+            call_id="call-test-001",
+        )
+    
+    first_response = SimpleNamespace(
+        id="response-001",
+        output=[tool_call],
+    )
+
+    retry_response = SimpleNamespace(
+        id="response-002",
+        output=[SimpleNamespace(
+            type="function_call",
+            name="search_policy_library",
+            arguments='{"search_term": "training"}',
+            call_id="call-test-002",
+        )],
+    )
+
+    answer_response = SimpleNamespace(
+        output=[],
+        output_text="The available policies provide insufficient evidence.",
+    )
+
+    model_client = SimpleNamespace(
+        responses=SimpleNamespace(
+            create=AsyncMock(side_effect=[first_response, retry_response, answer_response]),
+        ),
+    )
+
+    mcp_client = SimpleNamespace(
+        list_tools=AsyncMock(return_value=SimpleNamespace(tools=[])),
+        call_tool=AsyncMock(side_effect=[
+            SimpleNamespace(
+                is_error=False,
+                structured_content={"result": []},
+            ),
+            SimpleNamespace(
+            is_error=False,
+            structured_content={"result": []},
+        )
+        ]),
+    )
+
+    result = asyncio.run(answer_policy_question(
+        "How long should training records be retained?",
+        model_client,
+        mcp_client,
+    ))
+
+    assert model_client.responses.create.await_count == 3
+    assert mcp_client.call_tool.await_count == 2
+    mcp_client.call_tool.assert_awaited_with(
+        "search_policy_library",
+        {"search_term": "training"},
+    )
+
+    final_request = model_client.responses.create.call_args.kwargs
+    assert "tools" not in final_request

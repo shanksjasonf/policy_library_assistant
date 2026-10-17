@@ -101,7 +101,7 @@ async def answer_policy_question(question, model_client, mcp_client):
                 })
 
         if not retry_outputs:
-            return answer.output_test
+            return answer.output_text
 
         if retry_outputs:
             final_answer = await model_client.responses.create(
@@ -117,7 +117,7 @@ async def answer_policy_question(question, model_client, mcp_client):
                 max_output_tokens=1000,
             )
 
-            return final_answer.output_test
+            return final_answer.output_text
 
 
 async def main():
