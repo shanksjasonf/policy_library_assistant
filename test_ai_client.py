@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from ai_client import execute_policy_tool, answer_policy_question
+from ai_client import execute_policy_tool, answer_policy_question, serialize_tool_result
 
 
 def test_execute_policy_tool_rejects_unsupported_tool():
@@ -257,3 +257,78 @@ def test_answer_policy_question_requires_policy_search():
     )
     model_client.responses.create.assert_awaited_once()
     mcp_client.call_tool.assert_not_awaited()
+
+def test_serialize_tool_result_preserves_error_message():
+    tool_result = SimpleNamespace(
+        is_error=True,
+        structured_content=None,
+        content=[
+            SimpleNamespace(
+                type="text",
+                text="Search term must be less than or equal to 200 characters.",
+            ),
+        ],
+    )
+
+    serialized = serialize_tool_result(tool_result)
+    payload = json.loads(serialized)
+
+    assert payload == {
+        "is_error": True,
+        "data": None,
+        "error": "Search term must be less than or equal to 200 characters.",
+    }
+
+def test_answer_policy_question_forwards_tool_error():
+    tool_call = SimpleNamespace(
+        type="function_call",
+        name="search_policy_library",
+        arguments='{"search_term": "retention"}',
+        call_id="call-test-001",
+    )
+
+    first_response = SimpleNamespace(
+        id="response-001",
+        output=[tool_call],
+    )
+
+    answer_response = SimpleNamespace(
+        output=[],
+        output_text="The policy search failed, so I cannot answer from policy evidence.",
+    )
+
+    model_client = SimpleNamespace(
+        responses=SimpleNamespace(
+            create=AsyncMock(side_effect=[first_response, answer_response]),
+        ),
+    )
+
+    mcp_client = SimpleNamespace(
+        list_tools=AsyncMock(return_value=SimpleNamespace(tools=[])),
+        call_tool=AsyncMock(return_value=SimpleNamespace(
+            is_error=True,
+            structured_content=None,
+            content=[
+                SimpleNamespace(type="text", text="Policy search unavailable.")
+            ]
+        )),
+    )
+
+    result = asyncio.run(answer_policy_question(
+        "How long should training records be retained?",
+        model_client,
+        mcp_client,
+    ))
+
+    assert model_client.responses.create.await_count == 2
+    mcp_client.call_tool.assert_awaited_once_with(
+        "search_policy_library",
+        {"search_term": "retention"},
+    )
+
+    answer_request = model_client.responses.create.call_args.kwargs
+    forwarded_result = json.loads(answer_request["input"][0]["output"])
+
+    assert forwarded_result["is_error"] is True
+    assert forwarded_result["error"] == "Policy search unavailable."
+    assert answer_request["tool_choice"] == "auto"

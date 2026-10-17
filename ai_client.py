@@ -17,6 +17,23 @@ async def execute_policy_tool(tool_call, mcp_client):
     arguments = json.loads(tool_call.arguments)
     return await mcp_client.call_tool(tool_call.name, arguments)
 
+
+def serialize_tool_result(tool_result):
+    payload = {
+        "is_error": tool_result.is_error,
+        "data": tool_result.structured_content,
+    }
+
+    if tool_result.is_error:
+        payload["error"] = " ".join(
+            block.text
+            for block in tool_result.content
+            if block.type == "text"
+        )
+
+    return json.dumps(payload)
+
+
 async def answer_policy_question(question, model_client, mcp_client):
     available_tools = await mcp_client.list_tools()
     tools = [
@@ -52,12 +69,7 @@ async def answer_policy_question(question, model_client, mcp_client):
                 {
                     "type": "function_call_output",
                     "call_id": item.call_id,
-                    "output": json.dumps(
-                        {
-                            "is_error": tool_result.is_error,
-                            "data": tool_result.structured_content,
-                        }
-                    )
+                    "output": serialize_tool_result(tool_result),
                 }
             )
 
@@ -97,10 +109,7 @@ async def answer_policy_question(question, model_client, mcp_client):
                 retry_outputs.append({
                     "type": "function_call_output",
                     "call_id": item.call_id,
-                    "output": json.dumps({
-                        "is_error": tool_result.is_error,
-                        "data": tool_result.structured_content,
-                    }),
+                    "output": serialize_tool_result(tool_result),
                 })
 
         if not retry_outputs:
