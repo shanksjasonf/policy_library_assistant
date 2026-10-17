@@ -66,6 +66,9 @@ async def answer_policy_question(question, model_client, mcp_client):
                     tool_result.structured_content == {"result": []}
                 )
 
+    if not tool_outputs:
+        return "No policy search was performed, so I cannot provide a grounded answer."
+    
     if tool_outputs:
         answer = await model_client.responses.create(
             model="gpt-5.4-mini",

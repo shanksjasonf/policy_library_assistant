@@ -228,3 +228,32 @@ def test_answer_policy_question_stops_after_empty_retry():
 
     final_request = model_client.responses.create.call_args.kwargs
     assert "tools" not in final_request
+
+def test_answer_policy_question_requires_policy_search():
+    model_response = SimpleNamespace(
+        output=[],
+        output_text="An answer without policy evidence.",
+    )
+
+    model_client = SimpleNamespace(
+        responses=SimpleNamespace(
+            create=AsyncMock(return_value=model_response),
+        ),
+    )
+
+    mcp_client = SimpleNamespace(
+        list_tools=AsyncMock(return_value=SimpleNamespace(tools=[])),
+        call_tool=AsyncMock(),
+    )
+
+    result = asyncio.run(answer_policy_question(
+        "What does the policy say?",
+        model_client,
+        mcp_client,
+    ))
+
+    assert result == (
+        "No policy search was performed, so I cannot provide a grounded answer."
+    )
+    model_client.responses.create.assert_awaited_once()
+    mcp_client.call_tool.assert_not_awaited()
