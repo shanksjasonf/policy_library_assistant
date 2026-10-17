@@ -1,0 +1,89 @@
+## Acceptance Criteria
+
+- Retrieval returns the evidence needed to answer the question.
+- Every factual policy claim is supported by returned evidence.
+- Citations identify supporting policies.
+- Missing evidence procduces an explicit limitation, not a generated answer.
+- A retry follows the initial search if the answer cannot be found. Only one retry is allowed.
+
+## Cases
+| ID | Question | Expected Behavior | Result|
+|---|---|---|---|
+| E01 | How long should training records be retained | Two years; cite POL-001. | Pass |
+| E02 | Can I use a personal device for remote work? | Device enrollment, MFA, and download restriction; cite POL-003. | Not run |
+| E03 | How many vacation days do employees receive? | State insufficient evidence; do not estimate entitlement. | Not run |
+| E04 | What information must be included when reporting a security incident? | Discovery time, systems involved, information affected; cite POL-004. | Not run |
+| E05 | Will I be terminated if I accidentally expose confidential records? | Do not predict termination. If POL-004 is retrieved, explain that disciplinary outcomes are undefined. | Not run |
+
+## Run Records
+Record each run's date, Git commit, model, question, search terms, returned policy IDs, final answer, and assessment.
+Assess retrieval, factual support, citations, and retry behavior separately.
+
+### E01-01
+- Date: 2026-10-17
+- Version: c3706f0 + local evidence reporting
+- Model: gpt-5.4-mini
+- Question: How long should training records be retained?
+- Search term: training records
+- Retrieved policies: POL-001
+- Retries: 0
+- Answer: Training records should be retained for two years. [POL-001]
+- Assessment: PASS - Retrieval, factual support, and citation meet requirements.
+
+### E02-01
+
+- Date: 2026-10-17
+- Version: c3706f0 + local evidence reporting
+- Model: gpt-5.4-mini
+- Question: Can I use a personal device for remote work?
+- Search term: personal device
+- Retrieved IDs: POL-003
+- Retries: 0
+- Answer: Yes, but only under specific conditions: personal devices may be used for remote work only when enrolled in the organization’s device management system, remote access requires multifactor authentication, and confidential information may not be downloaded onto personal devices [POL-003].
+- Assessment: PASS - Retrieval, factual support, and citation meet requirements.
+
+### E03-01
+
+- Date: 2026-10-17
+- Version: c3706f0 + local evidence reporting
+- Model: gpt-5.4-mini
+- Question: How many vacation days do employees receive?
+- Search terms: vacation → PTO
+- Retrieved IDs: [] → []
+- Retries: 1
+- Answer: I couldn’t find any policy evidence about vacation days. The policy search returned no relevant results for “vacation” or “PTO,” so the amount of vacation days employees receive is not available from the provided policy evidence.
+- Assessment: PASS - Appropriate response; no generated/assumed response or citation; retry limit respected.
+
+### E04-01
+
+- Date: 2026-10-17
+- Version: c3706f0 + local evidence reporting
+- Model: gpt-5.4-mini
+- Question: What information must I include when reporting a security incident?
+- Search terms: security incident → incident
+- Retrieved IDs: [] → POL-004
+- Retries: 1
+- Answer: When reporting a security incident, include: when the incident was discovered, the systems involved, and the information affected [POL-004]. The policy also says suspected loss or exposure of confidential information must be reported immediately to the security team [POL-004].
+- Assessment: PASS - Initial retrieval returned empty response; retry sucessfully identified the appropriate policy. Factual support, citations, completeness, and retry limit passed.
+
+### E05-01 — Paraphrase
+
+- Date: 2026-10-17
+- Version: c3706f0 + local evidence reporting
+- Model: gpt-5.4-mini
+- Question: Will I be terminated if I accidentally expose confidential records?
+- Search terms: confidential records → terminate
+- Retrieved IDs: [] → []
+- Retries: 1
+- Assessment: FAIL - Relevant-policy retrieval failed. However, no generated response and retry limit passed.
+
+### E05-02
+
+- Date: 2026-10-17
+- Version: c3706f0 + local evidence reporting
+- Model: gpt-5.4-mini
+- Question: Will I be fired if I accidentally expose confidential records?
+- Search terms: confidential records → confidential
+- Retrieved IDs: [] → POL-003, POL-004
+- Retries: 1
+- Assessment: PASS - Retry recovered relevant evidence. Correct limitation and supporting citations. The personal device information was accurate; however, it was not relevant to the question.

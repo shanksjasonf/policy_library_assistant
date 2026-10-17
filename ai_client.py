@@ -33,6 +33,17 @@ def serialize_tool_result(tool_result):
 
     return json.dumps(payload)
 
+def report_policy_evidence(tool_result):
+    if tool_result.is_error:
+        print("Policy search failed.")
+        return
+
+    data = tool_result.structured_content or {}
+    policies = data.get("result", [])
+    policy_ids = [policy["policy_id"] for policy in policies]
+
+    print(f"Retrieved policy IDs: {policy_ids}")
+
 
 async def answer_policy_question(question, model_client, mcp_client):
     available_tools = await mcp_client.list_tools()
@@ -64,6 +75,7 @@ async def answer_policy_question(question, model_client, mcp_client):
         if item.type == "function_call":
             print(f"Calling {item.name} with {item.arguments}")
             tool_result = await execute_policy_tool(item, mcp_client)
+            report_policy_evidence(tool_result)
             
             tool_outputs.append(
                 {
@@ -105,6 +117,7 @@ async def answer_policy_question(question, model_client, mcp_client):
             if item.type == "function_call":
                 print(f"Retrying {item.name} with {item.arguments}")
                 tool_result = await execute_policy_tool(item, mcp_client)
+                report_policy_evidence(tool_result)
 
                 retry_outputs.append({
                     "type": "function_call_output",
