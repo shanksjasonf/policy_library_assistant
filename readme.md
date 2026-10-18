@@ -11,7 +11,7 @@ A Python case study that demonstrates how an AI assitant can answer policy-relat
 | policy_search.py | Searches policy titles and content or finds the appropriate policy by its ID. |
 | tool_adapter.py | Converts MCP tool definitions into the format expected by OpenAI. |
 | policies.json | Contains policy information. |
-| evalidation.md | Documents testing/evaluation of the assistant's performance. | 
+| evaluation.md | Documents testing/evaluation of the assistant's performance. | 
 
 ## Scope and Limitations
 - Search uses case-insensitive substrings, not semantic matching. It does not understand meaning or automatically recognize related terms.
@@ -32,7 +32,7 @@ py -3.13 -m venv .venv
 
 - Install the client and test dependencies:
 ```
-& "./.venv/Scripts/python.exe" -m pip install -r requirement-client.txt -r requirements-dev.txt
+& "./.venv/Scripts/python.exe" -m pip install -r requirements-client.txt -r requirements-dev.txt
 ```
 
 - Create a local .env file:
@@ -49,7 +49,7 @@ NOTE: the .env file stores the key in plain text and is excluded from Git and Do
 
 - Start the AI policy assistant:
 ```
-& ./.venv/Scripts/python.exe" ai_client.py
+& "./.venv/Scripts/python.exe" ai_client.py
 ```
 
 The client starts the MCP server automatically. It does not require Docker for the local workflow.
