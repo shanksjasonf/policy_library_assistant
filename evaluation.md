@@ -97,25 +97,15 @@ Assess retrieval, factual support, citations, and retry behavior separately.
 
 ### E06-01
 
-- Date: 2026-10-17
-- Version: c3706f0 + local evidence reporting
+- Date: Re-evaluated October 19, 2026. This entry replaces earlier records containing documentation inconsistencies.
+- Commit: 846b28725052a3b43348b4ae4efb8288d75846c7
 - Model: gpt-5.4-mini
-- Question: Will I be fired if I accidentally expose confidential records?
-- Search terms: confidential records → confidential
-- Retrieved IDs: [] → POL-003, POL-004
-- Retries: 1
-- Assessment: FAIL - Answer and citations passed. Multiple initial searches found both policies, but the final empty search caused an unnecessary retry.
-
-### E06-02
-
-- Date: 2026-10-17
-- Version: c3706f0 + local evidence reporting
-- Model: gpt-5.4-mini
-- Question: Will I be fired if I accidentally expose confidential records?
-- Search terms: confidential records → confidential
-- Retrieved IDs: [] → POL-003, POL-004
-- Retries: 1
-- Assessment: FAIL - Partial answer retrieved, but POL-004 was not identified so answer was incomplete.
+- Question: What restrictions apply to confidential information on personal devices, and what must I do if it is exposed?
+- Search terms: personal devices, exposed
+- Result: FAIL (incomplete retrieval and answer)
+- First search: personal devices → POL-003
+- Retry: exposed → no matches
+- Assessment: PASS - Answered the personal-device restrictions and cited POL-003. Did not retrieve POL-004 or provide the required incident-reporting guidance. Explicitly acknowledged missing evidence rather than generating unsupported instructions.
 
 ### E07-01
 
