@@ -2,6 +2,8 @@
 
 A Python case study that demonstrates how an AI assitant can answer policy-related questions retrieved through MCP. The client connects an OpenAI model to a local MCP server, executes policy-related searches, and returns answers with citations. To manage token usage, the workflow permits an initial search and one additional search.
 
+This project demonstrates an AI client using an MCP server to retrieve and cite synthetic policies. Known limitations and observed results are documented in evaluation.md.
+
 ## Components
 | File | Purpose |
 |---|---|
